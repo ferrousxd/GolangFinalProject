@@ -22,7 +22,7 @@ func (ur *UserRepository) InsertUser(user models.User) {
 func (ur *UserRepository) GetUserByLogin(username string, password string) *models.User {
 	userBuilder := models.UserBuilder{}
 
-	rows, err := ur.Connection.Query(`SELECT username, email, status FROM users where username = $1 and password = $2`,
+	rows, err := ur.Connection.Query(`SELECT username, email, role, subscription_status, balance FROM users where username = $1 and password = $2`,
 		username, password)
 
 	if err != nil {
@@ -32,9 +32,11 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 	var user *models.User
 
 	if rows.Next(){
-		var username, email, status string
+		var username, email, role string
+		var subscriptionStatus bool
+		var balance float32
 
-		err := rows.Scan(&username, &email, &status)
+		err := rows.Scan(&username, &email, &role, &subscriptionStatus, &balance)
 
 		if err != nil {
 			fmt.Println(err)
@@ -44,9 +46,35 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 		user = userBuilder.
 			SetUsername(username).
 			SetEmail(email).
-			SetStatus(status).
+			SetRole(role).
+			SetSubscriptionStatus(subscriptionStatus).
+			SetBalance(balance).
 			Build()
 	}
 
 	return user
+}
+
+func (ur *UserRepository) AddMoneyToBalance(email string, balance float32) {
+	if balance > 0{
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, balance, email)
+
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Println("ALO A GDE DEN'GI")
+	}
+}
+
+func (ur *UserRepository) RemoveMoneyFromBalance(u *models.User, balance float32) {
+	if balance > 0 && u.GetBalance() > balance{
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() - balance, u.GetEmail())
+
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Println("ALO A CHE TAM S DEN'GAMI")
+	}
 }
