@@ -20,3 +20,4 @@ func (userRepo *UserRepository) DeleteProduct(productId int) {
 func (userRepo *UserRepository) GetAllProducts() []*models.Product {
 	return nil
 }
+//Test
