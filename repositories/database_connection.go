@@ -38,5 +38,6 @@ func GetSingletonDatabase() Database {
 		db := singletonDatabase{conn}
 		instance = &db
 	})
+
 	return instance
 }

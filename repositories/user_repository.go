@@ -13,16 +13,18 @@ type UserRepository struct {
 func (ur *UserRepository) InsertUser(user models.User) {
 	_, err := ur.Connection.Exec(`INSERT INTO users(username, email, password) VALUES ($1, $2, $3)`,
 		user.GetUsername(), user.GetEmail(), user.GetPassword())
+
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Successfully inserted new user")
 }
 
 func (ur *UserRepository) GetUserByLogin(username string, password string) *models.User {
 	userBuilder := models.UserBuilder{}
 
-	rows, err := ur.Connection.Query(`SELECT username, email, status FROM users where username = $1 and password = $2`, username, password)
+	rows, err := ur.Connection.Query(`SELECT username, email, status FROM users where username = $1 and password = $2`,
+		username, password)
+
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +46,7 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 			SetEmail(email).
 			SetStatus(status).
 			Build()
-
 	}
+
 	return user
 }
