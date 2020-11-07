@@ -8,6 +8,11 @@ import (
 )
 
 func main() {
+	var input string
+	fmt.Scanln(&input)
+	fmt.Println(input)
+
+
 	db := repositories.GetSingletonDatabase()
 	dbConn := db.GetConnection()
 
