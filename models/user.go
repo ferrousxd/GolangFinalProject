@@ -1,5 +1,7 @@
 package models
 
+//test azatkali branch
+
 type User struct {
 	id 		 int
 	username string
