@@ -16,44 +16,19 @@ func main() {
 	db := repositories.GetSingletonDatabase()
 	dbConn := db.GetConnection()
 
-	rows, err := dbConn.Query("select * from Products")
+	productRepo := repositories.ProductRepository{ dbConn}
 
-	if err != nil {
-		panic(err)
-	}
+	productBuilder := models.ProductBuilder{}
 
-	defer rows.Close()
+	product := productBuilder.SetCompany("Samsung").SetPrice(42.1).SetModel("S2").Build()
 
-	fmt.Println(rows)
+	productRepo.InsertProduct(*product)
+	allProducts := productRepo.GetAllProducts()
 
-	var products []*models.Product
-
-	for rows.Next() {
-		productBuilder := models.ProductBuilder{}
-
-		var id 		int
-		var model 	string
-		var company string
-		var price 	float32
-
-		err := rows.Scan(&id, &model, &company, &price)
-
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		product := productBuilder.
-			SetId(id).
-			SetModel(model).
-			SetCompany(company).
-			SetPrice(price).
-			Build()
-
-		products = append(products, product)
-	}
-
-	for _, p := range products {
+	for _, p := range allProducts {
 		fmt.Println(p.GetId(), p.GetModel(), p.GetPrice(), p.GetCompany())
 	}
+
+	productRepo.DeleteProduct(1)
+
 }
