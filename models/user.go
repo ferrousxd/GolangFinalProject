@@ -10,11 +10,13 @@ type observer interface {
 }
 
 type User struct {
-	id 		 int
-	username string
-	email 	 string
-	password string
-	status	 string
+	id                 int
+	username           string
+	email              string
+	password           string
+	role               string
+	subscriptionStatus bool
+	balance			   float32
 }
 
 type userMod func(*User)
@@ -24,36 +26,50 @@ type UserBuilder struct {
 }
 
 func (b *UserBuilder) SetId(id int) *UserBuilder {
-	b.actions = append(b.actions, func(p *User) {
-		p.id = id
+	b.actions = append(b.actions, func(u *User) {
+		u.id = id
 	})
 	return b
 }
 
 func (b *UserBuilder) SetUsername(username string) *UserBuilder {
-	b.actions = append(b.actions, func(p *User) {
-		p.username = username
+	b.actions = append(b.actions, func(u *User) {
+		u.username = username
 	})
 	return b
 }
 
 func (b *UserBuilder) SetEmail(email string) *UserBuilder {
-	b.actions = append(b.actions, func(p *User) {
-		p.email = email
+	b.actions = append(b.actions, func(u *User) {
+		u.email = email
 	})
 	return b
 }
 
 func (b *UserBuilder) SetPassword(password string) *UserBuilder {
-	b.actions = append(b.actions, func(p *User) {
-		p.password = password
+	b.actions = append(b.actions, func(u *User) {
+		u.password = password
 	})
 	return b
 }
 
-func (b *UserBuilder) SetStatus(status string) *UserBuilder {
-	b.actions = append(b.actions, func(p *User) {
-		p.status = status
+func (b *UserBuilder) SetRole(role string) *UserBuilder {
+	b.actions = append(b.actions, func(u *User) {
+		u.role = role
+	})
+	return b
+}
+
+func (b *UserBuilder) SetSubscriptionStatus(subscriptionStatus bool) *UserBuilder {
+	b.actions = append(b.actions, func(u *User) {
+		u.subscriptionStatus = subscriptionStatus
+	})
+	return b
+}
+
+func (b *UserBuilder) SetBalance(balance float32) *UserBuilder {
+	b.actions = append(b.actions, func(u *User) {
+		u.balance = balance
 	})
 	return b
 }
@@ -84,8 +100,16 @@ func (u *User) GetPassword() string {
 	return u.password
 }
 
-func (u *User) GetStatus() string {
-	return u.status
+func (u *User) GetRole() string {
+	return u.role
+}
+
+func (u *User) GetSubscriptionStatus() bool {
+	return u.subscriptionStatus
+}
+
+func (u *User) GetBalance() float32 {
+	return u.balance
 }
 
 func (u *User) update(model string) {
