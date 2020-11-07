@@ -1,10 +1,17 @@
 package models
 
+type subject interface {
+	register(Observer observer)
+	deregister(Observer observer)
+	notifyAll()
+}
+
 type Product struct {
-	id      int
-	model   string
-	company string
-	price   float32
+	id      	 int
+	model   	 string
+	company 	 string
+	price   	 float32
+	observerList []observer
 }
 
 type productMod func(*Product)
@@ -65,4 +72,18 @@ func (p *Product) GetCompany() string {
 
 func (p *Product) GetPrice() float32 {
 	return p.price
+}
+
+func (p *Product) register(o observer) {
+
+}
+
+func (p *Product) deregister(o observer) {
+
+}
+
+func (p *Product) notifyAll() {
+	for _, observer := range p.observerList {
+		observer.update(p.model)
+	}
 }

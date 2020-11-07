@@ -18,7 +18,7 @@ func (s *singletonDatabase) GetConnection() *sql.DB {
 }
 
 func getConnection() *sql.DB {
-	connStr := "user=postgres password=140499 dbname=go_project sslmode=disable"
+	connStr := "user=postgres port=8081 password=159753 dbname=go_project sslmode=disable"
 
 	conn, err := sql.Open("postgres", connStr)
 
@@ -38,5 +38,6 @@ func GetSingletonDatabase() Database {
 		db := singletonDatabase{conn}
 		instance = &db
 	})
+
 	return instance
 }
