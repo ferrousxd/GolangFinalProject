@@ -74,10 +74,10 @@ func (pr *ProductRepository) GetProductById(productId int) models.Product  {
 	var company string
 	var price 	float32
 	row.Next()
-	error := row.Scan(&id, &model, &company, &price)
+	err = row.Scan(&id, &model, &company, &price)
 
-	if error != nil {
-		fmt.Println(error)
+	if err != nil {
+		fmt.Println(err)
 	}
 	product := productBuilder.
 		SetId(id).
