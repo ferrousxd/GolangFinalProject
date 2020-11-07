@@ -1,7 +1,5 @@
 package models
 
-//test azatkali branch
-
 type User struct {
 	id 		 int
 	username string
@@ -51,6 +49,16 @@ func (b *UserBuilder) SetStatus(status string) *UserBuilder {
 	return b
 }
 
+func (b *UserBuilder) Build() *User {
+	user := &User{}
+
+	for _, i := range b.actions {
+		i(user)
+	}
+
+	return user
+}
+
 func (u *User) GetId() int {
 	return u.id
 }
@@ -65,4 +73,8 @@ func (u *User) GetEmail() string {
 
 func (u *User) GetPassword() string {
 	return u.password
+}
+
+func (u *User) GetStatus() string {
+	return u.status
 }
