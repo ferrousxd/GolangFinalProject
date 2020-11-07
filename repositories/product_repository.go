@@ -64,33 +64,36 @@ func (pr *ProductRepository) GetAllProducts() []*models.Product {
 	return products
 }
 
-func (pr *ProductRepository) GetProductById(productId int) models.Product  {
-	row, err := pr.Connection.Query(`SELECT id, model, company, price FROM products WHERE id = $1`, productId )
+func (pr *ProductRepository) GetProductById(productId int) *models.Product {
+	productBuilder := models.ProductBuilder{}
+
+	rows, err := pr.Connection.Query(`SELECT id, model, company, price FROM products WHERE id = $1`, productId)
   
 	if err != nil {
 		panic(err)
 	}
-  
-	productBuilder := models.ProductBuilder{}
 
-	var id 		int
-	var model 	string
-	var company string
-	var price 	float32
-	row.Next()
-  
-  err := row.Scan(&id, &model, &company, &price)
+	var product *models.Product
 
-	if err != nil {
-		fmt.Println(error)
+	if rows.Next() {
+		var id 		int
+		var model 	string
+		var company string
+		var price 	float32
+
+		err := rows.Scan(&id, &model, &company, &price)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		product = productBuilder.
+			SetId(id).
+			SetModel(model).
+			SetCompany(company).
+			SetPrice(price).
+			Build()
 	}
   
-	product := productBuilder.
-		SetId(id).
-		SetModel(model).
-		SetCompany(company).
-		SetPrice(price).
-		Build()
-  
-	return *product
+	return product
 }
