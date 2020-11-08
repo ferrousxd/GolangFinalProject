@@ -11,54 +11,51 @@ type orderFacade struct {
 	user 			*models.User
 	balance 		float32
 	notification 	*notification
-	products 		[]*models.Product
+	Products 		[]models.Decorator
 	userRepo		repositories.UserRepository
 }
 
-func NewOrderFacade(u *models.User, ps []*models.Product, ur repositories.UserRepository) *orderFacade {
-	fmt.Println("Starting to process order...")
+func NewOrderFacade(u *models.User, ps []models.Decorator, ur repositories.UserRepository) *orderFacade {
 	orderFacade := &orderFacade{
 		user:         u,
 		balance:      u.GetBalance(),
 		notification: &notification{},
-		products:     ps,
+		Products:     ps,
 		userRepo:     ur,
-	}
-
-	if ps == nil {
-		fmt.Println("You have no items!")
-	} else {
-		fmt.Println("Total price of order with discount: ", calculateTotalPrice(ps))
-		orderFacade.PrintProduct()
 	}
 
 	return orderFacade
 }
 
 func (of *orderFacade) PrintProduct(){
-	count := 1
-	for _, p := range of.products {
-		fmt.Println(count, " | ", p.GetId(), " | ", p.GetCompany(), " | " + p.GetModel(), " | ", p.GetPrice())
-		count++
+	rowNumber := 1
+	if of.Products != nil {
+		fmt.Println("Total price of products with discount: ", calculateTotalPrice(of.Products))
+		for _, p := range of.Products {
+			fmt.Println(rowNumber, " | ", p.GetId(), " | ", p.GetCompany(), " | " + p.GetModel(), " | ", p.GetPrice())
+			rowNumber++
+		}
+	} else if of.Products == nil {
+		fmt.Println("You have no items!")
 	}
 }
 
-func (of *orderFacade) RemoveFromOrder(countTable int) {
-	s := of.products
+func (of *orderFacade) RemoveFromOrder(rowNumber int) {
+	s := of.Products
 	productListLength := len(s)
 	for i, _ := range s {
-		if countTable == i {
+		if rowNumber - 1 == i {
 			s[productListLength-1], s[i] = s[i], s[productListLength-1]
 		}
 	}
-	of.products = s[:productListLength-1]
+	of.Products = s[:productListLength-1]
 
 	//s := *of.products
 	//s = append(s[:id], s[id+1:]...)
 	//*of.products = s
 }
 
-func calculateTotalPrice(ps []*models.Product) float32 {
+func calculateTotalPrice(ps []models.Decorator) float32 {
 	var totalPrice float32
 	var totalDiscount float32
 
@@ -101,15 +98,17 @@ func calculateTotalPrice(ps []*models.Product) float32 {
 }
 
 func (of *orderFacade) MakeOrder() {
-	if of.userRepo.RemoveMoneyFromBalance(of.user, calculateTotalPrice(of.products)) == true {
+	if of.userRepo.RemoveMoneyFromBalance(of.user, calculateTotalPrice(of.Products)) == true {
+		fmt.Println("Starting to process order...")
 		of.notification.sendSuccessOrderNotification()
-		of.products = nil
+		of.Products = nil
 	} else {
 		fmt.Println("ALO A CHE TAM S DEN'GAMI")
 	}
 }
 
 func (of *orderFacade) CancelOrder() {
+	of.Products = nil
 	of.notification.sendCloseOrderNotification()
 }
 

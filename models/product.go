@@ -5,9 +5,16 @@ type subject interface {
 	RemoveObserver(Observer observer)
 	NotifyAllObservers()
 	//Decorator
+	//GetPrice() float32
+}
+//component interface
+type Decorator interface {
+	GetId() int
+	GetModel() string
+	GetCompany() string
 	GetPrice() float32
 }
-
+//concrete component
 type Product struct {
 	id      	 int
 	model   	 string
@@ -16,29 +23,65 @@ type Product struct {
 	observerList []observer
 }
 
-//Decorator
+//concrete decorator
 type With128GB struct {
-	product Product
+	Decorator Decorator
+}
+
+func (w128 *With128GB) GetId() int {
+	return w128.Decorator.GetId()
+}
+
+func (w128 *With128GB) GetModel() string {
+	return w128.Decorator.GetModel()
+}
+
+func (w128 *With128GB) GetCompany() string {
+	return w128.Decorator.GetCompany()
 }
 
 func (w128 *With128GB) GetPrice() float32 {
-	return w128.product.GetPrice()*1.1
+	return w128.Decorator.GetPrice()*1.1
 }
 
 type With256GB struct {
-	product Product
+	Decorator Decorator
+}
+
+func (w256 *With256GB) GetId() int {
+	return w256.Decorator.GetId()
+}
+
+func (w256 *With256GB) GetModel() string {
+	return w256.Decorator.GetModel()
+}
+
+func (w256 *With256GB) GetCompany() string {
+	return w256.Decorator.GetCompany()
 }
 
 func (w256 *With256GB) GetPrice() float32 {
-	return w256.product.GetPrice()*1.25
+	return w256.Decorator.GetPrice()*1.25
 }
 
-type Case struct {
-	product Product
+type WithCase struct {
+	Decorator Decorator
 }
 
-func (c *Case) GetPrice() float32 {
-	return c.product.GetPrice()*1.05
+func (c *WithCase) GetId() int {
+	return c.Decorator.GetId()
+}
+
+func (c *WithCase) GetModel() string {
+	return c.Decorator.GetModel()
+}
+
+func (c *WithCase) GetCompany() string {
+	return c.Decorator.GetCompany()
+}
+
+func (c *WithCase) GetPrice() float32 {
+	return c.Decorator.GetPrice()*1.05
 }
 //Decorator
 
