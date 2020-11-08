@@ -4,6 +4,8 @@ type subject interface {
 	AddObserver(Observer observer)
 	RemoveObserver(Observer observer)
 	NotifyAllObservers()
+	//Decorator
+	GetPrice() float32
 }
 
 type Product struct {
@@ -14,6 +16,33 @@ type Product struct {
 	observerList []observer
 }
 
+//Decorator
+type With128GB struct {
+	product Product
+}
+
+func (w128 *With128GB) GetPrice() float32 {
+	return w128.product.GetPrice()*1.1
+}
+
+type With256GB struct {
+	product Product
+}
+
+func (w256 *With256GB) GetPrice() float32 {
+	return w256.product.GetPrice()*1.25
+}
+
+type Case struct {
+	product Product
+}
+
+func (c *Case) GetPrice() float32 {
+	return c.product.GetPrice()*1.05
+}
+//Decorator
+
+//Builder Fluid
 type productMod func(*Product)
 
 type ProductBuilder struct {
@@ -57,6 +86,7 @@ func (b *ProductBuilder) Build() *Product {
 
 	return product
 }
+//Builder Fluid
 
 func (p *Product) GetId() int {
 	return p.id
@@ -74,6 +104,7 @@ func (p *Product) GetPrice() float32 {
 	return p.price
 }
 
+//Observer
 func (p *Product) AddObserver(o observer) {
 	p.observerList = append(p.observerList, o)
 }
@@ -98,3 +129,4 @@ func (p *Product) NotifyAllObservers() {
 		observer.Notify(p.model)
 	}
 }
+//Observer

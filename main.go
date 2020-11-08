@@ -114,4 +114,15 @@ func main() {
 	newFacade.PrintProduct()
 
 	newFacade.MakeOrder()
+
+	// Which product you want to add to order(ID)
+	// 1
+	// productStandard := productRepo.GetProductById(1)
+	// This product.GetModel has 64 GB of memory. Do you want to change the amount of storage?
+	// Yes / No
+	// Yes
+	// 1. 128 GB
+	// 2. 256 GB
+	// If 128 / 256 -> productWithAdditional := With256{product: productStandard}
+
 }
