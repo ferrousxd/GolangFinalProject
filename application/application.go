@@ -1,6 +1,7 @@
 package application
 
 import (
+	"GolangFinalProject/facade"
 	"GolangFinalProject/models"
 	"GolangFinalProject/repositories"
 	"fmt"
@@ -15,6 +16,7 @@ type Application struct {
 }
 
 var user *models.User
+var selectedProducts []models.Decorator
 
 func NewApplication(productRepo repositories.ProductRepository,
 	userRepo repositories.UserRepository) *Application  {
@@ -127,12 +129,14 @@ func (a *Application) SignUp()  {
 func (a *Application) MainMenu()  {
 	for {
 		fmt.Println("Main menu.")
-		fmt.Println("1. Make Order")
+		fmt.Println("1. Order menu")
 		fmt.Println("2. Get list of products")
 		fmt.Println("3. Get list of subscribed products")
 		fmt.Println("4. Subscribe to product updates")
 		fmt.Println("5. Unsubscribe from product updates")
-		fmt.Println("6. Log out")
+		fmt.Println("6. Replenish balance")
+		fmt.Println("7. Check balance")
+		fmt.Println("8. Log out")
 
 		var choice int
 
@@ -140,11 +144,7 @@ func (a *Application) MainMenu()  {
 
 		if choice == 1 {
 			// Азаткали, пиши свой код здесь
-
-
-			
-
-
+			a.OrderMenu()
 		} else if choice == 2 {
 			fmt.Println("List of products:")
 
@@ -181,6 +181,20 @@ func (a *Application) MainMenu()  {
 			fmt.Scan(&productId)
 
 			a.userRepo.ChangeSubscriptionStatus(productId, user.GetId(), "remove")
+		} else if choice == 6 {
+			fmt.Println("Enter the sum which you want to add:")
+
+			var amount float32
+
+			fmt.Scan(&amount)
+
+			a.userRepo.AddMoneyToBalance(user, amount)
+			userId := user.GetId()
+			user = a.userRepo.GetUserById(userId)
+
+			fmt.Println("Balance was updated successfully!")
+		} else if choice == 7 {
+			fmt.Println("Your current balance: ", user.GetBalance())
 		} else {
 			user = nil
 			break
@@ -266,6 +280,108 @@ func (a *Application) AdminMenu()  {
 	}
 }
 
+func (a *Application) OrderMenu()  {
+	orderFacade := facade.NewOrderFacade(user, selectedProducts, a.userRepo)
+	for {
+		fmt.Println("Order menu:")
+		fmt.Println("1. Add product to card")
+		fmt.Println("2. Remove product from card")
+		fmt.Println("3. Get list of ordered products")
+		fmt.Println("4. Make order")
+		fmt.Println("5. Cancel order")
+		fmt.Println("6. Exit")
+
+		var choice int
+
+		fmt.Scan(&choice)
+
+		if choice == 1{
+			fmt.Println("Enter the ID of the product, that you want to add to card:")
+
+			products := a.productRepo.GetAllProducts()
+
+			a.printSliceOfProducts(products)
+
+			var productId int
+
+			fmt.Scan(&productId)
+
+			product := a.productRepo.GetProductById(productId)
+
+			fmt.Println("This", product.GetModel(), "has 64 GB of memory. Do you want to change the amount of storage? (Yes / No)")
+
+			var choiceMemory string
+
+			fmt.Scan(&choiceMemory)
+
+			var productDifMemory models.Decorator
+
+			if choiceMemory == "Yes" {
+				fmt.Println("Choose amount of memory:")
+				fmt.Println("1. 128 GB")
+				fmt.Println("2. 256 GB")
+
+				var choiceOfMemory int
+
+				fmt.Scan(&choiceOfMemory)
+
+				if choiceOfMemory == 1 {
+					productDifMemory = &models.With128GB{Decorator: product}
+
+				} else if choiceOfMemory == 2 {
+					productDifMemory = &models.With256GB{Decorator: product}
+				}
+			} else if choiceMemory == "No" {
+				productDifMemory = product
+			}
+
+			fmt.Println("Do you want product with case? (Yes / No)")
+
+			var choiceCase string
+
+			fmt.Scan(&choiceCase)
+
+			if choiceCase == "Yes" {
+				productWithCase := models.WithCase{Decorator: productDifMemory}
+
+				selectedProducts = append(selectedProducts, &productWithCase)
+				orderFacade.Products = selectedProducts
+
+				fmt.Println("Product was successfully added to card!")
+
+			} else if choiceCase == "No" {
+				selectedProducts = append(selectedProducts, productDifMemory)
+				orderFacade.Products = selectedProducts
+
+				fmt.Println("Product was successfully added to card!")
+			}
+		} else if choice == 2{
+			fmt.Println("Enter the row number of the product, that you want to remove from card:")
+
+			orderFacade.PrintProduct()
+
+			var rowNumber int
+
+			fmt.Scan(&rowNumber)
+
+			orderFacade.RemoveFromOrder(rowNumber)
+
+			fmt.Println("Product was successfully removed from card!")
+		} else if choice == 3{
+			fmt.Println("List of added products:")
+
+			orderFacade.PrintProduct()
+		} else if choice == 4{
+			orderFacade.MakeOrder()
+			user =  a.userRepo.GetUserById(user.GetId())
+		} else if choice == 5{
+			orderFacade.CancelOrder()
+			selectedProducts = nil
+		} else {
+			break
+		}
+	}
+}
 
 func (a *Application) printSliceOfProducts(products []*models.Product) {
 	for _, p := range products {

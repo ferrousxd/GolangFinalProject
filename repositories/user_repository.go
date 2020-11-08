@@ -55,6 +55,42 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 	return user
 }
 
+func (ur *UserRepository) GetUserById(userId int) *models.User {
+	userBuilder := models.UserBuilder{}
+
+	rows, err := ur.Connection.Query(`SELECT id, username, email, role, balance FROM users where id = $1`,
+		userId)
+
+	if err != nil {
+		panic(err)
+	}
+
+	var user *models.User
+
+	if rows.Next(){
+		var id int
+		var username, email, role string
+		var balance float32
+
+		err := rows.Scan(&id, &username, &email, &role, &balance)
+
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+
+		user = userBuilder.
+			SetId(id).
+			SetUsername(username).
+			SetEmail(email).
+			SetRole(role).
+			SetBalance(balance).
+			Build()
+	}
+
+	return user
+}
+
 func (ur *UserRepository) ChangeSubscriptionStatus(productId int, userId int, operation string) {
 	if operation == "add" {
 		_, err := ur.Connection.Exec("INSERT INTO subscriptions(product_id, user_id) VALUES ($1, $2)", productId, userId)
