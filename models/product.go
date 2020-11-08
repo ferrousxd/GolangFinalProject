@@ -1,9 +1,11 @@
 package models
 
+import "GolangFinalProject/repositories"
+
 type subject interface {
-	register(Observer observer)
-	deregister(Observer observer)
-	notifyAll()
+	AddObserver(Observer observer, userRepo repositories.UserRepository)
+	RemoveObserver(Observer observer, userRepo repositories.UserRepository)
+	NotifyAllObservers()
 }
 
 type Product struct {
@@ -74,16 +76,29 @@ func (p *Product) GetPrice() float32 {
 	return p.price
 }
 
-func (p *Product) register(o observer) {
-
+func (p *Product) AddObserver(o observer, userRepo repositories.UserRepository) {
+	p.observerList = append(p.observerList, o)
+	userRepo.ChangeSubscriptionStatus(o.GetId(), "add")
 }
 
-func (p *Product) deregister(o observer) {
-
+func (p *Product) RemoveObserver(o observer, userRepo repositories.UserRepository) {
+	p.observerList = removeFromSlice(p.observerList, o)
+	userRepo.ChangeSubscriptionStatus(o.GetId(), "remove")
 }
 
-func (p *Product) notifyAll() {
+func removeFromSlice(observerList []observer, observerToRemove observer) []observer {
+	observerListLength := len(observerList)
+	for i, observer := range observerList {
+		if observerToRemove.GetId() == observer.GetId() {
+			observerList[observerListLength-1], observerList[i] = observerList[i], observerList[observerListLength-1]
+			return observerList[:observerListLength-1]
+		}
+	}
+	return observerList
+}
+
+func (p *Product) NotifyAllObservers() {
 	for _, observer := range p.observerList {
-		observer.update(p.model)
+		observer.Notify(p.model)
 	}
 }
