@@ -1,10 +1,8 @@
 package models
 
-import "GolangFinalProject/repositories"
-
 type subject interface {
-	AddObserver(Observer observer, userRepo repositories.UserRepository)
-	RemoveObserver(Observer observer, userRepo repositories.UserRepository)
+	AddObserver(Observer observer)
+	RemoveObserver(Observer observer)
 	NotifyAllObservers()
 }
 
@@ -76,14 +74,12 @@ func (p *Product) GetPrice() float32 {
 	return p.price
 }
 
-func (p *Product) AddObserver(o observer, userRepo repositories.UserRepository) {
+func (p *Product) AddObserver(o observer) {
 	p.observerList = append(p.observerList, o)
-	userRepo.ChangeSubscriptionStatus(o.GetId(), "add")
 }
 
-func (p *Product) RemoveObserver(o observer, userRepo repositories.UserRepository) {
+func (p *Product) RemoveObserver(o observer) {
 	p.observerList = removeFromSlice(p.observerList, o)
-	userRepo.ChangeSubscriptionStatus(o.GetId(), "remove")
 }
 
 func removeFromSlice(observerList []observer, observerToRemove observer) []observer {

@@ -22,7 +22,7 @@ func (ur *UserRepository) InsertUser(user models.User) {
 func (ur *UserRepository) GetUserByLogin(username string, password string) *models.User {
 	userBuilder := models.UserBuilder{}
 
-	rows, err := ur.Connection.Query(`SELECT username, email, role, subscription_status, balance FROM users where username = $1 and password = $2`,
+	rows, err := ur.Connection.Query(`SELECT id, username, email, role, balance FROM users where username = $1 and password = $2`,
 		username, password)
 
 	if err != nil {
@@ -32,11 +32,11 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 	var user *models.User
 
 	if rows.Next(){
+		var id int
 		var username, email, role string
-		var subscriptionStatus bool
 		var balance float32
 
-		err := rows.Scan(&username, &email, &role, &subscriptionStatus, &balance)
+		err := rows.Scan(&id, &username, &email, &role, &balance)
 
 		if err != nil {
 			fmt.Println(err)
@@ -44,10 +44,10 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 		}
 
 		user = userBuilder.
+			SetId(id).
 			SetUsername(username).
 			SetEmail(email).
 			SetRole(role).
-			SetSubscriptionStatus(subscriptionStatus).
 			SetBalance(balance).
 			Build()
 	}
@@ -55,15 +55,15 @@ func (ur *UserRepository) GetUserByLogin(username string, password string) *mode
 	return user
 }
 
-func (ur *UserRepository) ChangeSubscriptionStatus(userId int, operation string) {
+func (ur *UserRepository) ChangeSubscriptionStatus(productId int, userId int, operation string) {
 	if operation == "add" {
-		_, err := ur.Connection.Exec("UPDATE users SET subscription_status = true WHERE id = $1", userId)
+		_, err := ur.Connection.Exec("INSERT INTO subscriptions(product_id, user_id) VALUES ($1, $2)", productId, userId)
 
 		if err != nil {
 			panic(err)
 		}
 	} else if operation == "remove" {
-		_, err := ur.Connection.Exec("UPDATE users SET subscription_status = false WHERE id = $1", userId)
+		_, err := ur.Connection.Exec("DELETE FROM subscriptions WHERE product_id = $1 AND user_id = $2", productId, userId)
 
 		if err != nil {
 			panic(err)
@@ -71,8 +71,8 @@ func (ur *UserRepository) ChangeSubscriptionStatus(userId int, operation string)
 	}
 }
 
-func (ur *UserRepository) GetSubscribers() []*models.User {
-	rows, err := ur.Connection.Query(`SELECT id, username, email FROM users WHERE subscription_status = true`)
+func (ur *UserRepository) GetSubscribersByProductId(productId int) []*models.User {
+	rows, err := ur.Connection.Query(`SELECT u.id, u.username, u.email FROM users u INNER JOIN subscriptions s on u.id = s.user_id INNER JOIN products p on p.id = s.product_id WHERE s.product_id = $1`, productId)
 
 	if err != nil {
 		panic(err)
@@ -106,9 +106,9 @@ func (ur *UserRepository) GetSubscribers() []*models.User {
 	return users
 }
 
-func (ur *UserRepository) AddMoneyToBalance(email string, balance float32) {
-	if balance > 0 {
-		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, balance, email)
+func (ur *UserRepository) AddMoneyToBalance(u *models.User, plusAmount float32) {
+	if plusAmount > 0 {
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() + plusAmount, u.GetEmail())
 
 		if err != nil {
 			panic(err)
@@ -118,14 +118,16 @@ func (ur *UserRepository) AddMoneyToBalance(email string, balance float32) {
 	}
 }
 
-func (ur *UserRepository) RemoveMoneyFromBalance(u *models.User, balance float32) {
-	if balance > 0 && u.GetBalance() > balance {
-		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() - balance, u.GetEmail())
+func (ur *UserRepository) RemoveMoneyFromBalance(u *models.User, minusAmount float32) bool {
+	if minusAmount > 0 && u.GetBalance() >= minusAmount {
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() - minusAmount, u.GetEmail())
 
 		if err != nil {
 			panic(err)
 		}
+
+		return true
 	} else {
-		fmt.Println("ALO A CHE TAM S DEN'GAMI")
+		return false
 	}
 }
