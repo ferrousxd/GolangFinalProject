@@ -72,7 +72,7 @@ func (ur *UserRepository) ChangeSubscriptionStatus(productId int, userId int, op
 }
 
 func (ur *UserRepository) GetSubscribersByProductId(productId int) []*models.User {
-	rows, err := ur.Connection.Query(`SELECT u.id, u.username, u.email FROM users u INNER JOIN subscriptions s on u.id = s.user_id INNER JOIN products p on p.id = s.product_id WHERE s.product_id = $1`, productId)
+	rows, err := ur.Connection.Query(`SELECT DISTINCT u.id, u.username, u.email FROM users u INNER JOIN subscriptions s on u.id = s.user_id INNER JOIN products p on p.id = s.product_id WHERE s.product_id = $1`, productId)
 
 	if err != nil {
 		panic(err)
