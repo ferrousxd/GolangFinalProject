@@ -115,7 +115,7 @@ func (u *User) GetBalance() float32 {
 
 func (u *User) Notify(model string) {
 	from := "superusergoproject@gmail.com"
-	password := "imyaMoyeiSobaki"
+	imyaMoyeiSobaki := "imyaMoyeiSobaki"
 
 	to := []string {
 		u.GetEmail(),
@@ -124,14 +124,16 @@ func (u *User) Notify(model string) {
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
 
-	auth := smtp.PlainAuth("", from, password, smtpHost)
+	message := []byte("Hello, " + u.GetEmail() + "! Check out the brand new " + model + " in our shop!")
 
-	message := []byte("Hello, " + u.GetEmail() + "! Check out our brand new product: " + model)
+	auth := smtp.PlainAuth("", from, imyaMoyeiSobaki, smtpHost)
 
-	err := smtp.SendMail(smtpHost + ":" + smtpPort, auth, from, to, message)
-
-	if err != nil {
-		fmt.Println(err)
-		return
+	for i := 0; i < 1; i++ {
+		err := smtp.SendMail(smtpHost + ":" + smtpPort, auth, from, to, message)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("Сообщение было успешно отправлено")
 	}
 }
