@@ -16,7 +16,6 @@ type User struct {
 	email              string
 	password           string
 	role               string
-	subscriptionStatus bool
 	balance			   float32
 }
 
@@ -61,13 +60,6 @@ func (b *UserBuilder) SetRole(role string) *UserBuilder {
 	return b
 }
 
-func (b *UserBuilder) SetSubscriptionStatus(subscriptionStatus bool) *UserBuilder {
-	b.actions = append(b.actions, func(u *User) {
-		u.subscriptionStatus = subscriptionStatus
-	})
-	return b
-}
-
 func (b *UserBuilder) SetBalance(balance float32) *UserBuilder {
 	b.actions = append(b.actions, func(u *User) {
 		u.balance = balance
@@ -103,10 +95,6 @@ func (u *User) GetPassword() string {
 
 func (u *User) GetRole() string {
 	return u.role
-}
-
-func (u *User) GetSubscriptionStatus() bool {
-	return u.subscriptionStatus
 }
 
 func (u *User) GetBalance() float32 {
