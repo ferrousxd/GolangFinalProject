@@ -6,7 +6,8 @@ import (
 )
 
 type observer interface {
-	update(string)
+	Notify(string)
+	GetId() int
 }
 
 type User struct {
@@ -88,7 +89,7 @@ func (u *User) GetStatus() string {
 	return u.status
 }
 
-func (u *User) update(model string) {
+func (u *User) Notify(model string) {
 	from := "superusergoproject@gmail.com"
 	password := "imyaMoyeiSobaki"
 
@@ -99,22 +100,14 @@ func (u *User) update(model string) {
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
 
-	message := []byte("To: <" + to[0] + ">\r\n" +
-		"From: Chechnya Bank Admin\n" +
-		"Subject: New product has arrived!\n" +
-		"\n" +
-		"Hello " + to[0] + "! We hope you are doing great. " + "Now, " + model + " is available in our shop!\n")
-
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	for i := 0; i < 100; i++ {
-		err := smtp.SendMail(smtpHost + ":" + smtpPort, auth, from, to, message)
+	message := []byte("Hello, " + u.GetEmail() + "! Check out our brand new product: " + model)
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	err := smtp.SendMail(smtpHost + ":" + smtpPort, auth, from, to, message)
 
-		fmt.Println("Message was sent successfully")
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 }
