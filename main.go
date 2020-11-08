@@ -15,5 +15,4 @@ func main() {
 
 	newApplication := application.NewApplication(productRepo, userRepo)
 	newApplication.Start()
-
 }
