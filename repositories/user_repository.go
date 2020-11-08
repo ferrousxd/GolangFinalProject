@@ -107,25 +107,25 @@ func (ur *UserRepository) GetSubscribers() []*models.User {
 }
 
 func (ur *UserRepository) AddMoneyToBalance(email string, balance float32) {
- if balance > 0{
-  _, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, balance, email)
+	if balance > 0 {
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, balance, email)
 
-  if err != nil {
-   panic(err)
-  }
- } else {
-  fmt.Println("ALO A GDE DEN'GI")
- }
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Println("ALO A GDE DEN'GI")
+	}
 }
 
 func (ur *UserRepository) RemoveMoneyFromBalance(u *models.User, balance float32) {
- if balance > 0 && u.GetBalance() > balance{
-  _, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() - balance, u.GetEmail())
+	if balance > 0 && u.GetBalance() > balance {
+		_, err := ur.Connection.Exec(`UPDATE users SET balance = $1 WHERE email = $2`, u.GetBalance() - balance, u.GetEmail())
 
-  if err != nil {
-   panic(err)
-  }
- } else {
-  fmt.Println("ALO A CHE TAM S DEN'GAMI")
- }
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Println("ALO A CHE TAM S DEN'GAMI")
+	}
 }
