@@ -16,6 +16,22 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: ferrozmatic
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO ferrozmatic;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: ferrozmatic
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -124,42 +140,36 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: ferrozmatic
 --
 
-COPY public.products (id, model, company, price) FROM stdin;
-1	iPhone 12 mini	Apple	699.99
-2	iPhone XR	Apple	549.99
-3	iPhone SE 2020	Apple	549.99
-\.
+INSERT INTO public.products (id, model, company, price) VALUES (1, 'iPhone 12 mini', 'Apple', 699.99);
+INSERT INTO public.products (id, model, company, price) VALUES (2, 'iPhone XR', 'Apple', 549.99);
+INSERT INTO public.products (id, model, company, price) VALUES (3, 'iPhone SE 2020', 'Apple', 549.99);
 
 
 --
 -- Data for Name: subscriptions; Type: TABLE DATA; Schema: public; Owner: ferrozmatic
 --
 
-COPY public.subscriptions (product_id, user_id) FROM stdin;
-1	1
-1	2
-1	3
-2	2
-2	3
-3	2
-3	3
-3	1
-2	1
-\.
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (1, 1);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (1, 2);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (1, 3);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (2, 2);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (2, 3);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (3, 2);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (3, 3);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (3, 1);
+INSERT INTO public.subscriptions (product_id, user_id) VALUES (2, 1);
 
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: ferrozmatic
 --
 
-COPY public.users (id, username, email, password, role, balance) FROM stdin;
-2	Aza	azatkali.16@gmail.com	456	User	0
-3	Madik	madiyar.uss@gmail.com	789	User	0
-4	admin	chingiz.azimbayev@gmail.com	admin	Admin	0
-5	test	test@gmail.com	123456	User	0
-1	Chinga	ferrousxp@gmail.com	123	User	610.35376
-6	test1	test1@gmail.com	123456	User	0
-\.
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (2, 'Aza', 'azatkali.16@gmail.com', '456', 'User', 0);
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (3, 'Madik', 'madiyar.uss@gmail.com', '789', 'User', 0);
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (4, 'admin', 'chingiz.azimbayev@gmail.com', 'admin', 'Admin', 0);
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (5, 'test', 'test@gmail.com', '123456', 'User', 0);
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (1, 'Chinga', 'ferrousxp@gmail.com', '123', 'User', 610.35376);
+INSERT INTO public.users (id, username, email, password, role, balance) VALUES (6, 'test1', 'test1@gmail.com', '123456', 'User', 0);
 
 
 --
