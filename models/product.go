@@ -1,20 +1,20 @@
 package models
 
+// Observable
 type subject interface {
 	AddObserver(Observer observer)
 	RemoveObserver(Observer observer)
 	NotifyAllObservers()
-	//Decorator
-	//GetPrice() float32
 }
-//component interface
+
+// Component interface
 type Decorator interface {
 	GetId() int
 	GetModel() string
 	GetCompany() string
 	GetPrice() float32
 }
-//concrete component
+// Concrete Component and concrete Observable (2 в одном)
 type Product struct {
 	id      	 int
 	model   	 string
@@ -23,7 +23,7 @@ type Product struct {
 	observerList []observer
 }
 
-//concrete decorator
+// Concrete Decorator - 128GB
 type With128GB struct {
 	Decorator Decorator
 }
@@ -44,6 +44,7 @@ func (w128 *With128GB) GetPrice() float32 {
 	return w128.Decorator.GetPrice()*1.1
 }
 
+// Concrete Decorator - 256GB
 type With256GB struct {
 	Decorator Decorator
 }
@@ -64,6 +65,7 @@ func (w256 *With256GB) GetPrice() float32 {
 	return w256.Decorator.GetPrice()*1.25
 }
 
+// Concrete Decorator - Phone Case
 type WithCase struct {
 	Decorator Decorator
 }
@@ -83,9 +85,8 @@ func (c *WithCase) GetCompany() string {
 func (c *WithCase) GetPrice() float32 {
 	return c.Decorator.GetPrice()*1.05
 }
-//Decorator
 
-//Builder Fluid
+// Builder with Fluent Interfaces
 type productMod func(*Product)
 
 type ProductBuilder struct {
@@ -129,8 +130,8 @@ func (b *ProductBuilder) Build() *Product {
 
 	return product
 }
-//Builder Fluid
 
+// Getters for Concrete Component
 func (p *Product) GetId() int {
 	return p.id
 }
@@ -147,7 +148,7 @@ func (p *Product) GetPrice() float32 {
 	return p.price
 }
 
-//Observer
+// Observable methods
 func (p *Product) AddObserver(o observer) {
 	p.observerList = append(p.observerList, o)
 }
@@ -172,4 +173,3 @@ func (p *Product) NotifyAllObservers() {
 		observer.Notify(p.model)
 	}
 }
-//Observer
