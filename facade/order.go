@@ -27,7 +27,7 @@ func NewOrderFacade(u *models.User, ps []models.Decorator, ur repositories.UserR
 	return orderFacade
 }
 
-func (of *orderFacade) PrintProduct(){
+func (of *orderFacade) PrintProduct() {
 	rowNumber := 1
 	if of.Products != nil {
 		fmt.Println("Total price of products with discount: ", calculateTotalPrice(of.Products))
@@ -49,12 +49,9 @@ func (of *orderFacade) RemoveFromOrder(rowNumber int) {
 		}
 	}
 	of.Products = s[:productListLength-1]
-
-	//s := *of.products
-	//s = append(s[:id], s[id+1:]...)
-	//*of.products = s
 }
 
+// calculateTotalPrice() receives slice of products and calculates total with discounts, which depend on manufacturer, model, and etc.
 func calculateTotalPrice(ps []models.Decorator) float32 {
 	var totalPrice float32
 	var totalDiscount float32
@@ -97,6 +94,7 @@ func calculateTotalPrice(ps []models.Decorator) float32 {
 	return totalPrice
 }
 
+// If user has enough money - the order will be successfully executed - otherwise it will print out warning message
 func (of *orderFacade) MakeOrder() {
 	if of.userRepo.RemoveMoneyFromBalance(of.user, calculateTotalPrice(of.Products)) == true {
 		fmt.Println("Starting to process order...")
@@ -121,16 +119,3 @@ func (n *notification) sendSuccessOrderNotification() {
 func (n *notification) sendCloseOrderNotification() {
 	fmt.Println("Order was canceled successfully!")
 }
-
-//func newDiscountFacade(product models.Product) *discountFacade  {
-//	productPrice := product.GetPrice()
-//	productModel := product.GetModel()
-//	productCompany := product.GetCompany()
-//	fmt.Println("Starting to run discount...")
-//	discountFacade := &discountFacade{
-//		price: discountByPrice(productPrice),
-//		model: discountByModel(productModel),
-//		company: discountByCompany(productCompany),
-//	}
-//	fmt.Println("Discount is on ran")
-//}

@@ -5,11 +5,13 @@ import (
 	"net/smtp"
 )
 
+// Interface Observer
 type observer interface {
 	Notify(string)
 	GetId() int
 }
 
+// Concrete Observer
 type User struct {
 	id                 int
 	username           string
@@ -77,6 +79,7 @@ func (b *UserBuilder) Build() *User {
 	return user
 }
 
+// Observer method GetId()
 func (u *User) GetId() int {
 	return u.id
 }
@@ -101,6 +104,7 @@ func (u *User) GetBalance() float32 {
 	return u.balance
 }
 
+// Observer Notify method implementation
 func (u *User) Notify(model string) {
 	from := "superusergoproject@gmail.com"
 	imyaMoyeiSobaki := "imyaMoyeiSobaki"
